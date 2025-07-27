@@ -1,6 +1,7 @@
 
 [allowlist]
 regexes = [
+  '[A-Z0-9]{5}',
   # You can add more regex patterns to ignore here, each as a separate string in the array.
   # For example, to exclude example UUIDs:
   # '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}',
