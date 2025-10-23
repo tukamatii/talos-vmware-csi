@@ -1,27 +1,13 @@
 ---
-
+spec:
+  inputs:
+    name:
+      default: mega_linter
+---
 stages:
   - test
   - deploy
+  - docs
 
 include:
-  - component: $CI_SERVER_FQDN/oit/open-repositories/ci-cd-catalog/config_file_validate@~latest
-  - component: $CI_SERVER_FQDN/oit/open-repositories/ci-cd-catalog/scan_secrets@~latest
-  - component: $CI_SERVER_FQDN/oit/open-repositories/ci-cd-catalog/copy_to_smb@~latest
-    inputs:
-      username: $SMB_USER
-      password: $SMB_PASSWORD
-      server: //storage-04-dfs.okbtsp.local/Software_Deploy
-      share_path: kms
-      local_path: '.'
-      smb_convert_eol_to: crlf
-      clean_target_before_copy: "true"
-      stage: deploy
-    rules:
-      - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-        changes:
-          - "*.ps1"
-          - 'cactivedirectorymodule\*'
-        when: always
-      - if: $CI_COMMIT_TAG
-      - when: never
+  - component: $CI_SERVER_FQDN/oit/open-repositories/ci-cd-catalog/mega_linter@~latest
