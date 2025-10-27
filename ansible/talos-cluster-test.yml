@@ -1,6 +1,7 @@
 ---
+# vCenter
 vcenter_hostname: "vcenter-01.infra.corp"
-vcenter_cpi_user: "svc-k8s-vcenter"
+vcenter_cpi_user: "svc-k8s-vcenter@okbtsp.local"
 vcenter_cpi_password: !vault |
   $ANSIBLE_VAULT;1.1;AES256
   33616633343336346233303832306631333331393730643563306466643635323339643130306433
@@ -8,5 +9,22 @@ vcenter_cpi_password: !vault |
   31393234623532343266643734623161666339343566646263303536366363356562623265333937
   3730333134656130330a616137616335366336613633323933333466643563343335363363323034
   36396662613539646361656663313466316231646532626133666234396666306466
-vcenter_datacenter: "Datacenter"
-vcenter_thumbprint: 70:B8:80:D4:82:2B:D5:7B:3A:90:6A:1E:5F:D6:6A:DD:B8:5B:2B:22
+vcenter_datacenters:
+  - "Datacenter"
+#
+# Helm repository
+vsphere_csi_helm_repo_url: "https://vsphere-tmm.github.io/helm-charts"
+
+# Helm release
+vsphere_csi_release_name: "vsphere-csi"
+vsphere_csi_chart_ref: "vsphere-tmm/vsphere-csi"
+vsphere_csi_chart_version: "3.8.1"
+vsphere_csi_namespace: "vmware-csi"
+
+# StorageClass
+vsphere_csi_storageclass_enabled: true
+vsphere_csi_storageclass_default: true
+vsphere_csi_storage_policy_name: "VM Storage Policy for vSAN-Prod"
+vsphere_csi_reclaim_policy: "Retain"
+vsphere_csi_volume_binding_mode: "WaitForFirstConsumer"
+vsphere_csi_datastore_url: "ds:///vmfs/volumes/vsan:52b8e767c5d62dc2-19513fa231fbcea1/"

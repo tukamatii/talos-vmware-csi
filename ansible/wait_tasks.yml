@@ -1,47 +1,42 @@
 ---
-- name: Wait for vsphere-cloud-controller-manager DaemonSet to be fully rolled out
+- name: Wait for vsphere-csi-controller Deployment to be fully rolled out and available
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    name: vsphere-csi-controller
+    namespace: vmware-csi
+    kubeconfig: "{{ kube_config_file_no_loadbalancer }}"
+  register: csi_deployment
+  until: >
+    csi_deployment.resources | length > 0 and
+    csi_deployment.resources[0].status is defined and
+    csi_deployment.resources[0].status.replicas is defined and
+    csi_deployment.resources[0].status.availableReplicas is defined and
+    csi_deployment.resources[0].status.updatedReplicas is defined and
+    csi_deployment.resources[0].status.replicas == csi_deployment.resources[0].status.availableReplicas and
+    csi_deployment.resources[0].status.replicas == csi_deployment.resources[0].status.updatedReplicas
+  retries: 120
+  delay: 5
+  delegate_to: localhost
+
+- name: Wait for vsphere-csi DaemonSet to be fully rolled out and available
   kubernetes.core.k8s_info:
     api_version: apps/v1
     kind: DaemonSet
-    name: vsphere-cloud-controller-manager
-    namespace: kube-system
-    kubeconfig: "{{kube_config_file_no_loadbalancer}}"
-  register: cpi_ds
+    name: vsphere-csi
+    namespace: vmware-csi
+    kubeconfig: "{{ kube_config_file_no_loadbalancer }}"
+  register: csi_daemonset
   until: >
-    cpi_ds.resources | length > 0 and
-    cpi_ds.resources[0].status is defined and
-    cpi_ds.resources[0].status.desiredNumberScheduled is defined and
-    cpi_ds.resources[0].status.numberReady is defined and
-    cpi_ds.resources[0].status.updatedNumberScheduled is defined and
-    cpi_ds.resources[0].status.numberReady == cpi_ds.resources[0].status.desiredNumberScheduled and
-    cpi_ds.resources[0].status.updatedNumberScheduled == cpi_ds.resources[0].status.desiredNumberScheduled
-  retries: 60
-  delay: 10
-  delegate_to: localhost
-
-- name: Restart kubelet service on VIP node
-  ansible.builtin.shell:
-    cmd: "talosctl service kubelet restart -n {{ talos_interface_vip }} \
-      --talosconfig {{talos_config_folder}}{{ target }}.yaml "
-  delegate_to: localhost
-  run_once: true
-  async: 120
-  poll: 0
-
-- name: Wait one more minute
-  ansible.builtin.pause:
-    minutes: 1
-
-- name: Wait for all nodes to have cloud provider initialized (no uninitialized taint)
-  kubernetes.core.k8s_info:
-    api_version: v1
-    kind: Node
-    kubeconfig: "{{kube_config_file_no_loadbalancer}}"
-  register: nodes
-  until: >
-    nodes.resources is defined and
-    nodes.resources | length > 0 and
-    (nodes.resources | json_query('[?spec.taints[?key == `node.cloudprovider.kubernetes.io/uninitialized`]]') | length) == 0
+    csi_daemonset.resources | length > 0 and
+    csi_daemonset.resources[0].status is defined and
+    csi_daemonset.resources[0].status.desiredNumberScheduled is defined and
+    csi_daemonset.resources[0].status.numberAvailable is defined and
+    csi_daemonset.resources[0].status.numberReady is defined and
+    csi_daemonset.resources[0].status.updatedNumberScheduled is defined and
+    csi_daemonset.resources[0].status.desiredNumberScheduled == csi_daemonset.resources[0].status.numberAvailable and
+    csi_daemonset.resources[0].status.desiredNumberScheduled == csi_daemonset.resources[0].status.numberReady and
+    csi_daemonset.resources[0].status.desiredNumberScheduled == csi_daemonset.resources[0].status.updatedNumberScheduled
   retries: 120
   delay: 5
   delegate_to: localhost

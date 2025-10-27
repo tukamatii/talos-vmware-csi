@@ -1,0 +1,65 @@
+# Для обычных приложений
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test
+  labels:
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/audit: baseline
+    pod-security.kubernetes.io/warn: baseline
+---
+# privileged-debug-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: privileged-debug
+  namespace: test
+spec:
+  hostNetwork: true
+  hostPID: true
+  hostIPC: true
+  containers:
+    - name: debugger
+      image: alpine:latest
+      command: ["/bin/sleep", "3600"]
+      securityContext:
+        privileged: true
+        runAsUser: 0
+        capabilities:
+          add:
+            - SYS_ADMIN
+            - NET_ADMIN
+            - DAC_READ_SEARCH
+      volumeMounts:
+        - name: host-root
+          mountPath: /host
+        - name: kubelet-dir
+          mountPath: /kubelet
+        - name: dev
+          mountPath: /dev
+        - name: sys
+          mountPath: /sys
+        - name: proc
+          mountPath: /proc
+  volumes:
+    - name: host-root
+      hostPath:
+        path: /
+        type: Directory
+    - name: kubelet-dir
+      hostPath:
+        path: /var/lib/kubelet
+        type: Directory
+    - name: dev
+      hostPath:
+        path: /dev
+        type: Directory
+    - name: sys
+      hostPath:
+        path: /sys
+        type: Directory
+    - name: proc
+      hostPath:
+        path: /proc
+        type: Directory
+  restartPolicy: Never
