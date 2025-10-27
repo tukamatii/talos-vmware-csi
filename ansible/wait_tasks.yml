@@ -15,7 +15,7 @@
     csi_deployment.resources[0].status.updatedReplicas is defined and
     csi_deployment.resources[0].status.replicas == csi_deployment.resources[0].status.availableReplicas and
     csi_deployment.resources[0].status.replicas == csi_deployment.resources[0].status.updatedReplicas
-  retries: 120
+  retries: 360
   delay: 5
   delegate_to: localhost
 
@@ -37,6 +37,6 @@
     csi_daemonset.resources[0].status.desiredNumberScheduled == csi_daemonset.resources[0].status.numberAvailable and
     csi_daemonset.resources[0].status.desiredNumberScheduled == csi_daemonset.resources[0].status.numberReady and
     csi_daemonset.resources[0].status.desiredNumberScheduled == csi_daemonset.resources[0].status.updatedNumberScheduled
-  retries: 120
+  retries: 360
   delay: 5
   delegate_to: localhost

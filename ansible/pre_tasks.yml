@@ -13,29 +13,6 @@
       'datacenters': vcenter_datacenters
       }}) }}"
 
-- name: Debug vCenter dict and full Helm values
-  debug:
-    msg:
-      - "vCenter config dict:"
-      - "{{ vcenter_dict | to_nice_yaml }}"
-      - "Full Helm release_values:"
-      - "{{ helm_release_values | to_nice_yaml }}"
-  vars:
-    helm_release_values:
-      global:
-        config:
-          global:
-            cluster-id: "{{ target | trim }}"
-          storageclass:
-            enabled: "{{ vsphere_csi_storageclass_enabled }}"
-            storagepolicyname: "{{ vsphere_csi_storage_policy_name }}"
-            default: "{{ vsphere_csi_storageclass_default }}"
-            reclaimPolicy: "{{ vsphere_csi_reclaim_policy }}"
-            volumebindingmode: "{{ vsphere_csi_volume_binding_mode }}"
-            datastoreurl: "{{ vsphere_csi_datastore_url }}"
-          vcenter: "{{ vcenter_dict }}"
-  delegate_to: localhost
-
 - name: Ensure vmware-csi namespace exists with privileged PodSecurity policy
   kubernetes.core.k8s:
     api_version: v1
@@ -78,15 +55,3 @@
     wait_timeout: "600s"
   ignore_errors: true
   delegate_to: localhost
-
-- name: Patch vsphere-csi StorageClass to set reclaimPolicy=Retain
-  kubernetes.core.k8s:
-    api_version: storage.k8s.io/v1
-    kind: StorageClass
-    name: vsphere-csi
-    state: patched
-    definition:
-      reclaimPolicy: Retain
-    kubeconfig: "{{ kube_config_file_no_loadbalancer }}"
-  delegate_to: localhost
-
