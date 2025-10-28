@@ -5,7 +5,7 @@
     kind: Deployment
     name: vsphere-csi-controller
     namespace: vmware-csi
-    kubeconfig: "{{ kube_config_file_no_loadbalancer }}"
+    kubeconfig: "{{ kube_config_file }}"
   register: csi_deployment
   until: >
     csi_deployment.resources | length > 0 and
@@ -25,7 +25,7 @@
     kind: DaemonSet
     name: vsphere-csi
     namespace: vmware-csi
-    kubeconfig: "{{ kube_config_file_no_loadbalancer }}"
+    kubeconfig: "{{ kube_config_file }}"
   register: csi_daemonset
   until: >
     csi_daemonset.resources | length > 0 and

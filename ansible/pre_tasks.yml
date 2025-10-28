@@ -26,7 +26,7 @@
           pod-security.kubernetes.io/enforce: privileged
           pod-security.kubernetes.io/audit: privileged
           pod-security.kubernetes.io/warn: privileged
-    kubeconfig: "{{ kube_config_file_no_loadbalancer }}"
+    kubeconfig: "{{ kube_config_file }}"
   delegate_to: localhost
 
 - name: Deploy vsphere-tmm from Helm chart
@@ -36,7 +36,7 @@
     chart_version: "{{ vsphere_csi_chart_version }}"
     namespace: "{{ vsphere_csi_namespace }}"
     create_namespace: true
-    kubeconfig: "{{ kube_config_file_no_loadbalancer }}"
+    kubeconfig: "{{ kube_config_file }}"
     release_values:
       global:
         config:
